@@ -1,7 +1,12 @@
 
-module.exports = {
-    Student: require('./Student.model'),
-    Teacher: require('./Teacher.model'),
-    Subject: require('./Subject.model'),
-    Lecture: require('./Lecture.model'),
-}
+import Student from './Student.model.js';
+import Teacher from './Teacher.model.js';
+import Subject from './Subject.model.js';
+import Lecture from './Lecture.model.js';
+
+export {
+    Student,
+    Teacher,
+    Subject,
+    Lecture,
+};

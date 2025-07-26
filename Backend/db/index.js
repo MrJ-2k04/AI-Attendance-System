@@ -1,6 +1,6 @@
 
-const { connect } = require('mongoose');
-const { DB_CONNECTION_URL } = require('../config');
+import { connect } from 'mongoose';
+import { DB_CONNECTION_URL } from '../config.js';
 
 const connectionOptions = {
     // useNewUrlParser: true,
@@ -9,15 +9,13 @@ const connectionOptions = {
     // useCreateIndex: true
 }
 
-module.exports = {
-    connectToDb: (callback) => {
-        connect(DB_CONNECTION_URL, connectionOptions)
-            .then(conn => {
-                console.log("Connected to MongoDB Successfully!");
-                return callback()
-            })
-            .catch(err => {
-                return callback(err)
-            })
-    },
-}
+export const connectToDb = (callback) => {
+    connect(DB_CONNECTION_URL, connectionOptions)
+        .then(conn => {
+            console.log("Connected to MongoDB Successfully!");
+            return callback()
+        })
+        .catch(err => {
+            return callback(err)
+        })
+};

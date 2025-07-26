@@ -7,5 +7,5 @@ const corsMiddleware = ({ origin = "*", methods = ["GET", "POST", "PUT", "DELETE
   next();
 };
 
-module.exports = corsMiddleware;
+export default corsMiddleware;
 

@@ -1,5 +1,5 @@
 // models/Lecture.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const presentStudentSchema = new mongoose.Schema({
   rollNumber: { type: String, required: true },
@@ -21,4 +21,4 @@ const lectureSchema = new mongoose.Schema({
   ]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Lecture', lectureSchema);
+export default mongoose.model('Lecture', lectureSchema);

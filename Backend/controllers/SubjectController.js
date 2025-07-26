@@ -1,4 +1,4 @@
-const { Subject } = require('../models');
+import { Subject } from '../models/index.js';
 
 // CREATE
 const create = async (req, res) => {
@@ -51,4 +51,4 @@ const remove = async (req, res) => {
     }
 };
 
-module.exports = { create, getAll, getById, update, remove };
+export default { create, getAll, getById, update, remove };

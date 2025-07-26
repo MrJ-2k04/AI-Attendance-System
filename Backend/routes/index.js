@@ -1,15 +1,15 @@
 
+import express from 'express';
 // Imports
 // const auth = require("../middlewares/auth");
 // const admin = require('../middlewares/admin');
-const teacherRoutes = require("./Teacher.routes");
-const subjectRoutes = require("./Subject.routes");
-const studentRoutes = require("./Student.routes");
-const lectureRoutes = require("./Lecture.routes");
+import teacherRoutes from "./Teacher.routes.js";
+import subjectRoutes from "./Subject.routes.js";
+import studentRoutes from "./Student.routes.js";
+import lectureRoutes from "./Lecture.routes.js";
 
-
-module.exports = function (app) {
-  const router = require("express").Router();
+export default function (app) {
+  const router = express.Router();
   app.use(router);
 
   router.get("/", (req, res) => res.status(200).json({ type: "success", message: "Server is running" }));

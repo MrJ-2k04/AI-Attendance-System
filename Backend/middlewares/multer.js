@@ -1,4 +1,4 @@
-const Multer = require('multer');
+import Multer from 'multer';
 
 const multer = (specialRoutes = []) => (req, res, next) => {
     const upload = Multer({ storage: Multer.memoryStorage() });
@@ -18,4 +18,4 @@ const multer = (specialRoutes = []) => (req, res, next) => {
     return upload.any()(req, res, next);
 };
 
-module.exports = multer;
+export default multer;

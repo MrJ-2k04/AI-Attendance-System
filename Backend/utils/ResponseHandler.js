@@ -28,6 +28,13 @@ class ResponseHandler {
       message,
     });
   }
+
+  static requestTimeout(res, message = 'Request timeout') {
+    return res.status(408).json({
+      type: 'error',
+      message,
+    });
+  }
 }
 
-module.exports = ResponseHandler;
+export default ResponseHandler;

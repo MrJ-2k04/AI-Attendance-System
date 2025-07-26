@@ -49,9 +49,9 @@ const AWS_CONFIG = {
 
 
 
-module.exports = {
+export {
     APP_PORT,
     DB_CONNECTION_URL,
     LINKS,
     AWS_CONFIG,
-}
+};

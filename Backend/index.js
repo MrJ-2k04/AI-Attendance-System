@@ -1,8 +1,10 @@
-require('dotenv').config({ quiet: true });
+// Load environment variables first, before any other imports
+import dotenv from 'dotenv';
+dotenv.config({ quiet: true });
 
-const express = require('express');
-const { APP_PORT } = require('./config');
-const { connectToDb } = require('./db');
+// Use dynamic imports for modules that depend on environment variables
+import express from 'express';
+
 var reconnect = null;
 
 // ################################################### CONTROL PANEL ###################################################
@@ -11,7 +13,13 @@ initializeServer();
 
 // ################################################### SERVER ###################################################
 
-function initializeServer() {
+async function initializeServer() {
+  // Dynamic imports to ensure environment variables are loaded first
+  const { APP_PORT } = await import('./config.js');
+  const { connectToDb } = await import('./db/index.js');
+  const setupMiddlewares = (await import('./middlewares/index.js')).default;
+  const setupRoutes = (await import('./routes/index.js')).default;
+
   // Database connection
   connectToDb((err) => {
     // Reconnection logic
@@ -24,8 +32,8 @@ function initializeServer() {
 
     // Setup Express App
     const app = express();
-    require("./middlewares")(app);
-    require("./routes")(app);
+    setupMiddlewares(app);
+    setupRoutes(app);
 
     // Start the Server
     app.listen(APP_PORT, () => console.log(`Server started on port ${APP_PORT}`));

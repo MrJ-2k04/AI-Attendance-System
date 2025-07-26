@@ -1,11 +1,11 @@
-const ResponseHandler = require("../utils/ResponseHandler");
+import ResponseHandler from "../utils/ResponseHandler.js";
 
 // Custom timeout middleware
 const timeoutMiddleware = (timeoutMillis = 5000) => (req, res, next) => {
     const timeoutId = setTimeout(() => {
         if (!res.headersSent) {
             // Handle timeout
-            return new ResponseHandler(res).requestTimeout();
+            return ResponseHandler.requestTimeout(res);
         }
     }, timeoutMillis);
 
@@ -16,4 +16,4 @@ const timeoutMiddleware = (timeoutMillis = 5000) => (req, res, next) => {
     next();
 };
 
-module.exports = timeoutMiddleware;
+export default timeoutMiddleware;

@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { subjectController } from '../controllers/index.js';
+
 const router = express.Router();
-const { subjectController } = require('../controllers');
 
 router.post('/', subjectController.create);
 router.get('/', subjectController.getAll);
@@ -8,4 +9,4 @@ router.get('/:id', subjectController.getById);
 router.put('/:id', subjectController.update);
 router.delete('/:id', subjectController.remove);
 
-module.exports = router;
+export default router;

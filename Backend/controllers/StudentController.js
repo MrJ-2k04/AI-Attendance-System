@@ -1,8 +1,8 @@
-const { Student } = require('../models');
-const AWS = require('aws-sdk');
-const { AWS_CONFIG } = require('../config');
-const ResponseHandler = require('../utils/ResponseHandler');
-const path = require('path');
+import { Student } from '../models/index.js';
+import AWS from 'aws-sdk';
+import { AWS_CONFIG } from '../config.js';
+import ResponseHandler from '../utils/ResponseHandler.js';
+import path from 'path';
 
 // Configure AWS S3
 const s3 = new AWS.S3({
@@ -106,4 +106,4 @@ const remove = async (req, res) => {
     }
 };
 
-module.exports = { create, getAll, getById, update, remove };
+export default { create, getAll, getById, update, remove };

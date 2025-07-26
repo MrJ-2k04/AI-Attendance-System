@@ -1,7 +1,7 @@
-const { Lecture } = require('../models');
-const AWS = require('aws-sdk');
-const { AWS_CONFIG } = require('../config');
-const path = require('path');
+import { Lecture } from '../models/index.js';
+import AWS from 'aws-sdk';
+import { AWS_CONFIG } from '../config.js';
+import path from 'path';
 
 // Configure AWS S3
 const s3 = new AWS.S3({
@@ -125,4 +125,4 @@ const generateAttendance = async (req, res) => {
     }
 };
 
-module.exports = { create, getAll, getById, update, remove, generateAttendance };
+export default { create, getAll, getById, update, remove, generateAttendance };

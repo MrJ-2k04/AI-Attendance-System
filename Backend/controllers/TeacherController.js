@@ -1,5 +1,5 @@
-const { Teacher } = require('../models');
-const ResponseHandler = require('../utils/ResponseHandler');
+import { Teacher } from '../models/index.js';
+import ResponseHandler from '../utils/ResponseHandler.js';
 
 // CREATE
 const create = async (req, res) => {
@@ -55,7 +55,7 @@ const remove = async (req, res) => {
 };
 
 
-module.exports = {
+export default {
     create,
     getAll,
     getById,
