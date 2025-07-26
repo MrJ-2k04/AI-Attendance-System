@@ -5,7 +5,7 @@ const studentSchema = new mongoose.Schema({
   name: { type: String, required: true },
   rollNumber: { type: String, required: true, unique: true },
   division: { type: String, required: true },
-  embedding: { type: [Number], required: true }, // 128-d face encoding
+  embedding: { type: [Number], required: false }, // 128-d face encoding
   images: [
     {
       fileName: { type: String, required: true },

@@ -7,8 +7,7 @@ const presentStudentSchema = new mongoose.Schema({
 }, { _id: false });
 
 const lectureSchema = new mongoose.Schema({
-  subject_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Subject', required: true },
-  date: { type: Date, required: true },
+  subjectId: { type: mongoose.Schema.Types.ObjectId, ref: 'Subject', required: true },
   division: { type: String, required: true },
   attendance: [presentStudentSchema],
   images: [
