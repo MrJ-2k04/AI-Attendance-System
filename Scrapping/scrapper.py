@@ -2,7 +2,8 @@ import os
 import requests
 
 # Create uploads folder if it doesn't exist
-os.makedirs("../Model_Implementation/dataset", exist_ok=True)
+save_dir = "../Model_Implementation/dataset"
+os.makedirs(save_dir, exist_ok=True)
 
 # Base URL
 base_url = "https://svgupgca.svguerp.in/studentinfosys/photopic/CI211_"
@@ -20,7 +21,7 @@ for student_id in range(start_id, end_id + 1):
         response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
 
         # Save the file in uploads folder
-        file_path = os.path.join("facedata", f"{student_id_str}.jpg")
+        file_path = os.path.join(save_dir, f"{student_id_str}.jpg")
         with open(file_path, "wb") as file:
             file.write(response.content)
 

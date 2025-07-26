@@ -19,7 +19,7 @@ os.makedirs(output_dir, exist_ok=True)
 font = ImageFont.load_default()
 
 # Process classroom images 1.jpg to 4.jpg
-for img_index in range(5, 9):
+for img_index in range(1, 9):
     image_path = f"testing/{img_index}.jpg"
     input_image = face_recognition.load_image_file(image_path)
 
