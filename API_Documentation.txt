@@ -1,0 +1,765 @@
+===============================================================================
+                        AI ATTENDANCE SYSTEM - API DOCUMENTATION
+===============================================================================
+
+BASE URL: http://localhost:8080 (Development) | https://your-domain.com (Production)
+
+CONTENT TYPE: application/json (for JSON requests)
+               multipart/form-data (for file uploads)
+
+===============================================================================
+                               RESPONSE FORMAT
+===============================================================================
+
+All API responses follow this standard format:
+
+SUCCESS RESPONSE:
+{
+  "type": "success",
+  "message": "Success message",
+  "data": { ... } // Response data
+}
+
+ERROR RESPONSE:
+{
+  "type": "error",
+  "message": "Error message",
+  "error": "Error stack (in development)" // Optional
+}
+
+HTTP Status Codes:
+- 200: Success
+- 201: Created
+- 400: Bad Request
+- 404: Not Found
+- 408: Request Timeout
+- 500: Internal Server Error
+
+===============================================================================
+                                SERVER STATUS
+===============================================================================
+
+GET /
+Description: Check if server is running
+Parameters: None
+Response:
+{
+  "type": "success",
+  "message": "Server is running"
+}
+
+===============================================================================
+                                TEACHER APIs
+===============================================================================
+
+1. CREATE TEACHER
+POST /teacher
+Content-Type: application/json
+
+Required Fields:
+- name (string): Teacher's full name (2-100 characters, letters and spaces only)
+
+Request Body:
+{
+  "name": "John Doe"
+}
+
+Success Response (201):
+{
+  "type": "success",
+  "message": "Teacher created",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890a",
+    "name": "John Doe",
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+2. GET ALL TEACHERS
+GET /teacher
+Parameters: None
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Success",
+  "data": [
+    {
+      "_id": "60d5ecb54b24a1234567890a",
+      "name": "John Doe",
+      "createdAt": "2023-06-25T10:30:00.000Z",
+      "updatedAt": "2023-06-25T10:30:00.000Z",
+      "__v": 0
+    }
+  ]
+}
+
+3. GET TEACHER BY ID
+GET /teacher/{id}
+Parameters:
+- id (string): Teacher ID in URL path
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Success",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890a",
+    "name": "John Doe",
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+4. UPDATE TEACHER
+PUT /teacher/{id}
+Content-Type: application/json
+Parameters:
+- id (string): Teacher ID in URL path
+
+Optional Fields:
+- name (string): Updated teacher name
+
+Request Body:
+{
+  "name": "Jane Doe"
+}
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Teacher updated",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890a",
+    "name": "Jane Doe",
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T11:30:00.000Z",
+    "__v": 0
+  }
+}
+
+5. DELETE TEACHER
+DELETE /teacher/{id}
+Parameters:
+- id (string): Teacher ID in URL path
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Teacher deleted",
+  "data": null
+}
+
+===============================================================================
+                                SUBJECT APIs
+===============================================================================
+
+1. CREATE SUBJECT
+POST /subject
+Content-Type: application/json
+
+Required Fields:
+- name (string): Subject name (2-100 characters)
+- teacherId (string): Valid teacher ID
+
+Request Body:
+{
+  "name": "Mathematics",
+  "teacherId": "60d5ecb54b24a1234567890a"
+}
+
+Success Response (201):
+{
+  "type": "success",
+  "message": "Subject created successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890b",
+    "name": "Mathematics",
+    "teacherId": "60d5ecb54b24a1234567890a",
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+2. GET ALL SUBJECTS
+GET /subject
+Parameters: None
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Subjects retrieved successfully",
+  "data": [
+    {
+      "_id": "60d5ecb54b24a1234567890b",
+      "name": "Mathematics",
+      "teacherId": {
+        "_id": "60d5ecb54b24a1234567890a",
+        "name": "John Doe",
+        "createdAt": "2023-06-25T10:30:00.000Z",
+        "updatedAt": "2023-06-25T10:30:00.000Z",
+        "__v": 0
+      },
+      "createdAt": "2023-06-25T10:30:00.000Z",
+      "updatedAt": "2023-06-25T10:30:00.000Z",
+      "__v": 0
+    }
+  ]
+}
+
+3. GET SUBJECT BY ID
+GET /subject/{id}
+Parameters:
+- id (string): Subject ID in URL path
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Subject retrieved successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890b",
+    "name": "Mathematics",
+    "teacherId": {
+      "_id": "60d5ecb54b24a1234567890a",
+      "name": "John Doe",
+      "createdAt": "2023-06-25T10:30:00.000Z",
+      "updatedAt": "2023-06-25T10:30:00.000Z",
+      "__v": 0
+    },
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+4. UPDATE SUBJECT
+PUT /subject/{id}
+Content-Type: application/json
+Parameters:
+- id (string): Subject ID in URL path
+
+Optional Fields:
+- name (string): Updated subject name
+- teacherId (string): Updated teacher ID
+
+Request Body:
+{
+  "name": "Advanced Mathematics",
+  "teacherId": "60d5ecb54b24a1234567890a"
+}
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Subject updated successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890b",
+    "name": "Advanced Mathematics",
+    "teacherId": "60d5ecb54b24a1234567890a",
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T11:30:00.000Z",
+    "__v": 0
+  }
+}
+
+5. DELETE SUBJECT
+DELETE /subject/{id}
+Parameters:
+- id (string): Subject ID in URL path
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Subject deleted successfully",
+  "data": null
+}
+
+===============================================================================
+                                STUDENT APIs
+===============================================================================
+
+1. CREATE STUDENT
+POST /student
+Content-Type: multipart/form-data
+
+Required Fields:
+- name (string): Student's full name (2-100 characters, letters and spaces only)
+- rollNumber (string): Unique roll number (1-20 alphanumeric characters)
+- division (string): Division/class (1-10 characters)
+- studentImages (file[]): Image files (required, max 10 files)
+
+Optional Fields:
+- embedding (array): Face encoding array (128 dimensions)
+
+File Requirements:
+- Allowed formats: .jpg, .jpeg, .png
+- Maximum file size: 50MB per file
+- Maximum files: 10 per request
+- Field name for files: "studentImages"
+
+Form Data:
+name: "John Smith"
+rollNumber: "24CI2110116"
+division: "A"
+studentImages: [file1.jpg, file2.jpg, ...]
+
+Success Response (201):
+{
+  "type": "success",
+  "message": "Student created successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890c",
+    "name": "John Smith",
+    "rollNumber": "24CI2110116",
+    "division": "A",
+    "embedding": [],
+    "images": [
+      {
+        "fileName": "photo1.jpg",
+        "fileSize": 245760,
+        "key": "students/24CI2110116/1687689000000.jpg",
+        "url": "https://your-bucket.s3.region.amazonaws.com/students/24CI2110116/1687689000000.jpg",
+        "uploadedAt": "2023-06-25T10:30:00.000Z",
+        "_id": "60d5ecb54b24a1234567890d"
+      }
+    ],
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+2. GET ALL STUDENTS
+GET /student
+Parameters: None
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Students retrieved successfully",
+  "data": [
+    {
+      "_id": "60d5ecb54b24a1234567890c",
+      "name": "John Smith",
+      "rollNumber": "24CI2110116",
+      "division": "A",
+      "embedding": [],
+      "images": [
+        {
+          "fileName": "photo1.jpg",
+          "fileSize": 245760,
+          "key": "students/24CI2110116/1687689000000.jpg",
+          "url": "https://your-bucket.s3.region.amazonaws.com/students/24CI2110116/1687689000000.jpg",
+          "uploadedAt": "2023-06-25T10:30:00.000Z",
+          "_id": "60d5ecb54b24a1234567890d"
+        }
+      ],
+      "createdAt": "2023-06-25T10:30:00.000Z",
+      "updatedAt": "2023-06-25T10:30:00.000Z",
+      "__v": 0
+    }
+  ]
+}
+
+3. GET STUDENT BY ID
+GET /student/{id}
+Parameters:
+- id (string): Student ID in URL path
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Student retrieved successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890c",
+    "name": "John Smith",
+    "rollNumber": "24CI2110116",
+    "division": "A",
+    "embedding": [],
+    "images": [
+      {
+        "fileName": "photo1.jpg",
+        "fileSize": 245760,
+        "key": "students/24CI2110116/1687689000000.jpg",
+        "url": "https://your-bucket.s3.region.amazonaws.com/students/24CI2110116/1687689000000.jpg",
+        "uploadedAt": "2023-06-25T10:30:00.000Z",
+        "_id": "60d5ecb54b24a1234567890d"
+      }
+    ],
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+4. UPDATE STUDENT
+PUT /student/{id}
+Content-Type: application/json
+Parameters:
+- id (string): Student ID in URL path
+
+Optional Fields:
+- name (string): Updated student name
+- rollNumber (string): Updated roll number
+- division (string): Updated division
+- embedding (array): Updated face encoding
+
+Request Body:
+{
+  "name": "John Smith Jr",
+  "division": "B"
+}
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Student updated successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890c",
+    "name": "John Smith Jr",
+    "rollNumber": "24CI2110116",
+    "division": "B",
+    "embedding": [],
+    "images": [...],
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T11:30:00.000Z",
+    "__v": 0
+  }
+}
+
+5. DELETE STUDENT
+DELETE /student/{id}
+Parameters:
+- id (string): Student ID in URL path
+
+Note: This will also delete all associated images from AWS S3
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Student deleted successfully",
+  "data": null
+}
+
+===============================================================================
+                                LECTURE APIs
+===============================================================================
+
+1. CREATE LECTURE
+POST /lecture
+Content-Type: multipart/form-data
+
+Required Fields:
+- subjectId (string): Valid subject ID
+- division (string): Division/class (1-10 characters)
+- lectureFiles (file[]): Image files (required, max 10 files)
+
+Optional Fields:
+- attendance (array): Array of attendance objects
+
+File Requirements:
+- Allowed formats: .jpg, .jpeg, .png
+- Maximum file size: 50MB per file
+- Maximum files: 10 per request
+- Field name for files: "lectureFiles"
+
+Attendance Object Structure:
+{
+  "rollNumber": "24CI2110116",
+  "present": true
+}
+
+Form Data:
+subjectId: "60d5ecb54b24a1234567890b"
+division: "A"
+attendance: [{"rollNumber": "24CI2110116", "present": true}]
+lectureFiles: [file1.jpg, file2.jpg, ...]
+
+Success Response (201):
+{
+  "type": "success",
+  "message": "Lecture created successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890e",
+    "subjectId": "60d5ecb54b24a1234567890b",
+    "division": "A",
+    "attendance": [
+      {
+        "rollNumber": "24CI2110116",
+        "present": true
+      }
+    ],
+    "images": [
+      {
+        "fileName": "classroom1.jpg",
+        "fileSize": 512000,
+        "key": "lectures/60d5ecb54b24a1234567890b/60d5ecb54b24a1234567890e/images/1687689000000.jpg",
+        "url": "https://your-bucket.s3.region.amazonaws.com/lectures/...",
+        "uploadedAt": "2023-06-25T10:30:00.000Z",
+        "_id": "60d5ecb54b24a1234567890f"
+      }
+    ],
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+2. GET ALL LECTURES
+GET /lecture
+Parameters: None
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Lectures retrieved successfully",
+  "data": [
+    {
+      "_id": "60d5ecb54b24a1234567890e",
+      "subjectId": {
+        "_id": "60d5ecb54b24a1234567890b",
+        "name": "Mathematics",
+        "teacherId": "60d5ecb54b24a1234567890a",
+        "createdAt": "2023-06-25T10:30:00.000Z",
+        "updatedAt": "2023-06-25T10:30:00.000Z",
+        "__v": 0
+      },
+      "division": "A",
+      "attendance": [
+        {
+          "rollNumber": "24CI2110116",
+          "present": true
+        }
+      ],
+      "images": [...],
+      "createdAt": "2023-06-25T10:30:00.000Z",
+      "updatedAt": "2023-06-25T10:30:00.000Z",
+      "__v": 0
+    }
+  ]
+}
+
+3. GET LECTURE BY ID
+GET /lecture/{id}
+Parameters:
+- id (string): Lecture ID in URL path
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Lecture retrieved successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890e",
+    "subjectId": {
+      "_id": "60d5ecb54b24a1234567890b",
+      "name": "Mathematics",
+      "teacherId": "60d5ecb54b24a1234567890a",
+      "createdAt": "2023-06-25T10:30:00.000Z",
+      "updatedAt": "2023-06-25T10:30:00.000Z",
+      "__v": 0
+    },
+    "division": "A",
+    "attendance": [
+      {
+        "rollNumber": "24CI2110116",
+        "present": true
+      }
+    ],
+    "images": [...],
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T10:30:00.000Z",
+    "__v": 0
+  }
+}
+
+4. UPDATE LECTURE
+PUT /lecture/{id}
+Content-Type: application/json
+Parameters:
+- id (string): Lecture ID in URL path
+
+Optional Fields:
+- subjectId (string): Updated subject ID
+- division (string): Updated division
+- attendance (array): Updated attendance array
+
+Request Body:
+{
+  "division": "B",
+  "attendance": [
+    {"rollNumber": "24CI2110116", "present": true},
+    {"rollNumber": "24CI2110117", "present": false}
+  ]
+}
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Lecture updated successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890e",
+    "subjectId": "60d5ecb54b24a1234567890b",
+    "division": "B",
+    "attendance": [
+      {"rollNumber": "24CI2110116", "present": true},
+      {"rollNumber": "24CI2110117", "present": false}
+    ],
+    "images": [...],
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T11:30:00.000Z",
+    "__v": 0
+  }
+}
+
+5. DELETE LECTURE
+DELETE /lecture/{id}
+Parameters:
+- id (string): Lecture ID in URL path
+
+Note: This will also delete all associated images from AWS S3
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Lecture deleted successfully",
+  "data": null
+}
+
+6. GENERATE ATTENDANCE
+POST /lecture/{id}/generate
+Parameters:
+- id (string): Lecture ID in URL path
+
+Description: Generates attendance for a lecture (can be enhanced with AI face recognition)
+
+Success Response (200):
+{
+  "type": "success",
+  "message": "Attendance generated successfully",
+  "data": {
+    "_id": "60d5ecb54b24a1234567890e",
+    "subjectId": "60d5ecb54b24a1234567890b",
+    "division": "A",
+    "attendance": [...],
+    "images": [...],
+    "present": true,
+    "createdAt": "2023-06-25T10:30:00.000Z",
+    "updatedAt": "2023-06-25T11:30:00.000Z",
+    "__v": 0
+  }
+}
+
+===============================================================================
+                               ERROR RESPONSES
+===============================================================================
+
+400 Bad Request:
+{
+  "type": "error",
+  "message": "Validation error message or bad request details"
+}
+
+404 Not Found:
+{
+  "type": "error",
+  "message": "Resource not found"
+}
+
+408 Request Timeout:
+{
+  "type": "error",
+  "message": "Request timeout"
+}
+
+500 Internal Server Error:
+{
+  "type": "error",
+  "message": "Something went wrong",
+  "error": "Error stack trace (in development)"
+}
+
+===============================================================================
+                            VALIDATION RULES
+===============================================================================
+
+TEACHER:
+- name: Required, 2-100 characters, letters and spaces only
+
+SUBJECT:
+- name: Required, 2-100 characters
+- teacherId: Required, valid MongoDB ObjectId
+
+STUDENT:
+- name: Required, 2-100 characters, letters and spaces only
+- rollNumber: Required, 1-20 alphanumeric characters, unique
+- division: Required, 1-10 characters
+- images: Required for creation, image files only
+- embedding: Optional, array of numbers (128 dimensions)
+
+LECTURE:
+- subjectId: Required, valid MongoDB ObjectId
+- division: Required, 1-10 characters
+- images: Required for creation, image files only
+- attendance: Optional, array of attendance objects
+
+FILE UPLOAD:
+- Formats: .jpg, .jpeg, .png only
+- Max size: 50MB per file
+- Max files: 10 per request
+- Students field name: "studentImages"
+- Lectures field name: "lectureFiles"
+
+===============================================================================
+                               AWS S3 STRUCTURE
+===============================================================================
+
+The system uses AWS S3 for file storage with the following structure:
+
+students/
+  - {rollNumber}/
+    - {timestamp}.jpg
+    - {timestamp}.jpg
+
+lectures/
+  - {subjectId}/
+    - {lectureId}/
+      - images/
+        - {timestamp}.jpg
+        - {timestamp}.jpg
+      - generated_images/
+        - {timestamp_annotated}.jpg
+        - {timestamp_annotated}.jpg
+
+===============================================================================
+                                  NOTES
+===============================================================================
+
+1. All timestamps are in ISO 8601 format (UTC)
+2. MongoDB ObjectIds are 24-character hexadecimal strings
+3. File uploads require multipart/form-data content type
+4. JSON requests require application/json content type
+5. All image files are automatically uploaded to AWS S3
+6. File deletion is handled automatically when deleting students/lectures
+7. The system supports up to 10 files per upload request
+8. Face embeddings are stored as arrays of 128 floating-point numbers
+9. Attendance generation can be enhanced with AI face recognition
+10. All routes except server status require valid data
+
+===============================================================================
+                               DEVELOPMENT TIPS
+===============================================================================
+
+1. Use Postman or similar tools to test file uploads with multipart/form-data
+2. Ensure AWS credentials are properly configured for file uploads
+3. The server runs on port 8080 in development mode
+4. MongoDB connection URL can be configured via environment variables
+5. CORS is enabled for cross-origin requests
+6. Request timeout is configured to prevent hanging requests
+7. All database operations return populated data where applicable
+8. Error responses include stack traces in development mode only
+
+===============================================================================
