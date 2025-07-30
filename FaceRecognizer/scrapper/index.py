@@ -2,7 +2,7 @@ import os
 import requests
 
 # Create uploads folder if it doesn't exist
-save_dir = "../Model_Implementation/dataset"
+save_dir = "../dataset"
 os.makedirs(save_dir, exist_ok=True)
 
 # Base URL
