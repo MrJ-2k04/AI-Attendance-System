@@ -2,6 +2,16 @@
 
 A FastAPI microservice for facial embedding generation and attendance verification.
 
+## Start
+
+```sh
+# Development
+docker-compose -f docker-compose.dev.yml up --build
+
+# Production
+docker-compose -f docker-compose.prod.yml up --build
+```
+
 ## Endpoints
 
 ### POST /generate-embeddings

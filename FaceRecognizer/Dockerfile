@@ -1,0 +1,37 @@
+# Use a minimal Python base image
+FROM python:3.11-slim
+
+# Set environment variables to avoid interactive prompts during install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies required for dlib, face_recognition, and PIL
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    libopenblas-dev \
+    liblapack-dev \
+    libx11-dev \
+    libgtk-3-dev \
+    libboost-all-dev \
+    python3-opencv \
+    git \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app
+
+# Copy only requirements first for caching Docker layers
+COPY requirements.txt .
+
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Copy the rest of the app source
+COPY . .
+
+# Expose the port used by uvicorn
+EXPOSE 10000
+
+# Start the FastAPI app with live reload for development
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000", "--reload"]

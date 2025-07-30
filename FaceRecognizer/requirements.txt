@@ -1,6 +1,8 @@
 fastapi
 uvicorn
-numpy
 face_recognition
+numpy
 pillow
 python-multipart
+boto3
+python-dotenv

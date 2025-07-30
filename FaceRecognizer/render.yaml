@@ -1,9 +1,6 @@
 services:
   - type: web
     name: face-recognizer-api
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    env: docker
+    rootDir: .
     plan: free
-    autoDeploy: true
-    rootDir: FaceRecognizer

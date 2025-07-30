@@ -39,7 +39,7 @@ const AWS_CONFIG = {
 //       - images
 //         - {timestamp}.jpg
 //         - {timestamp}.jpg
-//       - generated_images
+//       - annotated_images
 //         - {timestamp_annotated}.jpg
 //         - {timestamp_annotated}.jpg
 //     - lec_id2
