@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: face-recognizer-api
-    env: docker
-    rootDir: .
-    plan: free

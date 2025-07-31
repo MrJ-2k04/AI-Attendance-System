@@ -1,0 +1,28 @@
+
+version: "3.11"
+services:
+  nodejs_backend:
+    container_name: nodejs_backend_service
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./Backend/.env
+    volumes:
+      - ./Backend:/app
+    depends_on:
+      - face_recognizer
+
+  face_recognizer:
+    container_name: face_recognizer_service
+    build:
+      context: ./FaceRecognizer
+      dockerfile: Dockerfile.dev
+    ports:
+      - "10000:10000"
+    env_file:
+      - ./FaceRecognizer/.env
+    volumes:
+      - ./FaceRecognizer:/app
