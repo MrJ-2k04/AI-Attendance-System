@@ -11,6 +11,9 @@ RUN npm install --production
 # Copy only necessary app files (excluding dev/test assets)
 COPY . .
 
+# Set environment variable for production
+ENV NODE_ENV=production
+
 # Expose the app port
 EXPOSE 80
 

@@ -1,5 +1,5 @@
 
-version: "3.11"
+
 services:
   nodejs_backend:
     container_name: nodejs_backend_service

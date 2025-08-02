@@ -4,7 +4,7 @@ services:
   backend:
     build:
       context: ./Backend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     container_name: nodejs_backend_service_prod
     ports:
       - "80:80"
@@ -18,7 +18,7 @@ services:
   recognizer:
     build:
       context: ./FaceRecognizer
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile
     container_name: face_recognizer_service_prod
     ports:
       - "10000:10000"
