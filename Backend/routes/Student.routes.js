@@ -1,12 +1,13 @@
 import express from 'express';
 import { studentController } from '../controllers/index.js';
+import idValidator from '../middlewares/idValidator.js';
 
 const router = express.Router();
 
 router.post('/', studentController.create);
 router.get('/', studentController.getAll);
-router.get('/:id', studentController.getById);
-router.put('/:id', studentController.update);
-router.delete('/:id', studentController.remove);
+router.get('/:id', idValidator, studentController.getById);
+router.put('/:id', idValidator, studentController.update);
+router.delete('/:id', idValidator, studentController.remove);
 
 export default router;

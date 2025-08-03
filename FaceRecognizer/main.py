@@ -31,7 +31,7 @@ async def generate_embeddings(files: List[UploadFile] = File(...)):
 
         embedding = encodings[0].tolist()
         response.append({
-            "rollNumber": file.filename,
+            "image": file.filename,
             "embedding": embedding
         })
 
@@ -41,15 +41,21 @@ async def generate_embeddings(files: List[UploadFile] = File(...)):
 @app.post("/verify-attendance")
 async def verify_attendance(
     images: List[UploadFile] = File(...),
-    embeddings: str = Form(...),
+    studentEmbeddings: str = Form(...),
     subjectId: str = Form(...),
-    lecId: str = Form(...)
+    lectureId: str = Form(...)
 ):
-    known_data = json.loads(embeddings)
-    known_embeddings = [np.array(item['embedding']) for item in known_data]
-    known_ids = [item['rollNumber'] for item in known_data]
-    font = ImageFont.load_default()
+    studentEmbeddings = json.loads(studentEmbeddings)
 
+    embeddings_map = {}
+    for student in studentEmbeddings:
+        rollNumber = student['rollNumber']
+        embeddings_map[rollNumber] = {
+            "images": [item['image'] for item in student['embeddings']],
+            "values": [np.array(item['embedding']) for item in student['embeddings']]
+        }
+
+    font = ImageFont.load_default()
     results = []
 
     for file in images:
@@ -63,20 +69,27 @@ async def verify_attendance(
         matched_ids = []
 
         for encoding, location in zip(encodings, locations):
-            matches = face_recognition.compare_faces(known_embeddings, encoding, tolerance=0.5)
-            distances = face_recognition.face_distance(known_embeddings, encoding)
-            best_match_index = np.argmin(distances)
+            best_match = None
+            best_distance = float("inf")
 
+            # Iterate through each student's embeddings
+            for rollNumber, data in embeddings_map.items():
+                matches = face_recognition.compare_faces(data['values'], encoding, tolerance=0.5)
+                distances = face_recognition.face_distance(data['values'], encoding)
+                min_distance = np.min(distances)
+
+                # Update best match if current match is closer
+                if matches[np.argmin(distances)] and min_distance < best_distance:
+                    best_match = rollNumber
+                    best_distance = min_distance
+
+            # Draw bounding box and label
             top, right, bottom, left = location
-            label = "Unknown"
-
-            if matches[best_match_index]:
-                label = known_ids[best_match_index]
-                matched_ids.append(label)
+            label = best_match if best_match else "Unknown"
+            matched_ids.append(label)
 
             # 🟥 Red for Unknown, 🟩 Green for known
             box_color = (255, 0, 0) if label == "Unknown" else (0, 255, 0)
-
             draw.rectangle(((left, top), (right, bottom)), outline=box_color, width=3)
 
             bbox = draw.textbbox((0, 0), label, font=font)
@@ -86,14 +99,14 @@ async def verify_attendance(
             )
             draw.text((left + 3, bottom + 3), label, fill=(0, 0, 0), font=font)
 
-
+        # Save annotated image to buffer
         buf = io.BytesIO()
         pil_img.save(buf, format='JPEG')
         image_bytes = buf.getvalue()
 
-        # S3 upload path: lectures/<subject_id>/<lec_id>/annotated_images/<timestamp>.jpg
+        # Upload annotated image to S3
         timestamped_name = f"{file.filename}"
-        path = f"lectures/{subjectId}/{lecId}/annotated_images"
+        path = f"lectures/{subjectId}/{lectureId}/annotated_images"
 
         try:
             s3_url, s3_key = upload_to_s3(image_bytes, timestamped_name, path)
@@ -102,9 +115,10 @@ async def verify_attendance(
 
         try:
             results.append({
-                "image": file.filename,
-                "matched_ids": matched_ids,
-                "image_url": s3_url,
+                "fileName": file.filename,
+                "fileSize": len(image_bytes),
+                "matchedIds": matched_ids,
+                "url": s3_url,
                 "key": s3_key
             })
         except Exception as e:

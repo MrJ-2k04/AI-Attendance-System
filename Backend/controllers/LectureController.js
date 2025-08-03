@@ -1,9 +1,11 @@
-import { Lecture } from "../models/index.js";
 import AWS from "aws-sdk";
-import { AWS_CONFIG } from "../config.js";
-import ResponseHandler from "../utils/ResponseHandler.js";
-import path from "path";
 import Joi from "joi";
+import path from "path";
+import { AWS_CONFIG } from "../config.js";
+import { Lecture, Student } from "../models/index.js";
+import { verifyAttendance } from "../services/index.js";
+import ResponseHandler from "../utils/ResponseHandler.js";
+import fs from "fs";
 
 // Configure AWS S3
 const s3 = new AWS.S3({
@@ -17,9 +19,7 @@ const create = async (req, res) => {
   // Validate request body
   const lectureSchema = Joi.object({
     subjectId: Joi.string().trim().required(),
-
-    division: Joi.string().trim().min(1).max(10).required(),
-
+    division: Joi.string().trim().length(1).required(),
     attendance: Joi.array()
       .items(
         Joi.object({
@@ -53,9 +53,6 @@ const create = async (req, res) => {
     return ResponseHandler.badRequest(res, errorMessages.join(", "));
   }
 
-  // Use validated data instead of req.body
-  const validatedData = value;
-
   // Check if files are provided
   if (!req.files || req.files.length === 0) {
     return ResponseHandler.badRequest(res, "At least one image is required");
@@ -84,19 +81,19 @@ const create = async (req, res) => {
   }
 
   const uploadedImages = [];
+  const files = [];
   let lecture;
   try {
     // Create lecture with validated data
-    lecture = await Lecture.create(validatedData);
-    const subjectId = validatedData.subjectId;
+    lecture = await Lecture.create(value);
+    const subjectId = value.subjectId;
 
     for (const file of req.files) {
       const extension = path.extname(file.originalname).toLowerCase();
+      const fileName = `${Date.now()}${extension}`;
       const params = {
         Bucket: AWS_CONFIG.bucketName,
-        Key: `lectures/${subjectId}/${
-          lecture.id
-        }/images/${Date.now()}${extension}`,
+        Key: `lectures/${subjectId}/${lecture.id}/images/${fileName}`,
         Body: file.buffer,
       };
 
@@ -109,11 +106,51 @@ const create = async (req, res) => {
         url: s3Response.Location,
         uploadedAt: new Date(),
       });
+      files.push({
+        originalname: fileName,
+        buffer: file.buffer,
+      })
+    }
+    lecture.images = uploadedImages;
+
+
+    // Get student embeddings
+    const studentEmbeddings = await Student.find({
+      division: value.division,
+    }, { embeddings: 1, rollNumber: 1 });
+
+
+    // Call external API for attendance verification
+    const apiResponse = await verifyAttendance({
+      images: files,
+      studentEmbeddings: studentEmbeddings,
+      subjectId: value.subjectId,
+      lectureId: lecture.id
+    });
+
+
+    // Update attendance from AI results
+    if (apiResponse.data && apiResponse.data.results) {
+      const presentRollNumbers = apiResponse.data.results.reduce((acc, cur) => acc.concat(cur.matchedIds), []);
+
+      // Save attendance
+      lecture.attendance = studentEmbeddings.map((student) => ({
+        rollNumber: student.rollNumber,
+        present: presentRollNumbers.includes(student.rollNumber),
+      }));
+
+      // Save annotated images
+      lecture.annotatedImages = apiResponse.data.results.map(result => ({
+        fileName: result.fileName,
+        fileSize: result.fileSize,
+        key: result.key,
+      }));
     }
 
-    // Update lecture with uploaded images
-    lecture.images = uploadedImages;
+
+    // Save lecture
     await lecture.save();
+
 
     return ResponseHandler.success(
       res,
@@ -161,8 +198,8 @@ const create = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const lectures = await Lecture.find()
-      .populate("subjectId")
-      .populate("attendance.studentId");
+      .populate({ path: "subjectId" })
+      .populate({ path: "attendance.studentId", strictPopulate: false });
     return ResponseHandler.success(
       res,
       lectures,
@@ -177,8 +214,8 @@ const getAll = async (req, res) => {
 const getById = async (req, res) => {
   try {
     const lecture = await Lecture.findById(req.params.id)
-      .populate("subjectId")
-      .populate("attendance.studentId");
+      .populate({ path: "subjectId" })
+      .populate({ path: "attendance.studentId", strictPopulate: false });
     if (!lecture) {
       return ResponseHandler.notFound(res, "Lecture not found");
     }

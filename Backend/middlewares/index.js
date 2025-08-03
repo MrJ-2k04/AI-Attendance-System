@@ -14,6 +14,6 @@ export default function (app) {
     app.use(cors({ origin: "*" }));
     app.use(express.json());
     app.use(express.urlencoded({ extended: false }));
-    app.use(timeoutMiddleware(5000)); // 5 seconds
+    app.use(timeoutMiddleware(150000)); // 150 seconds
     app.use(multerMiddleware([]));
 }

@@ -8,10 +8,14 @@ class ResponseHandler {
   }
 
   static error(res, error, statusCode = 500) {
+    if (typeof error === 'string') {
+      error = new Error(error);
+    }
+    
     return res.status(statusCode).json({
       type: 'error',
       message: error.message || 'Something went wrong',
-      error: error.stack || null,
+      // error: error.stack || null,
     });
   }
 

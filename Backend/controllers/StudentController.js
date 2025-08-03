@@ -1,9 +1,10 @@
-import { Student } from "../models/index.js";
 import AWS from "aws-sdk";
-import { AWS_CONFIG } from "../config.js";
-import ResponseHandler from "../utils/ResponseHandler.js";
-import path from "path";
 import Joi from "joi";
+import path from "path";
+import { AWS_CONFIG } from "../config.js";
+import { Student } from "../models/index.js";
+import { generateEmbeddings } from "../services/index.js";
+import ResponseHandler from "../utils/ResponseHandler.js";
 
 // Configure AWS S3
 const s3 = new AWS.S3({
@@ -51,9 +52,6 @@ const create = async (req, res) => {
     return ResponseHandler.badRequest(res, errorMessages.join(", "));
   }
 
-  // Use validated data instead of req.body
-  const validatedData = value;
-
   // Check if files are provided
   if (!req.files || req.files.length === 0) {
     return ResponseHandler.badRequest(res, "At least one image is required");
@@ -82,32 +80,54 @@ const create = async (req, res) => {
   }
 
   const uploadedImages = [];
+  const files = [];
   try {
     for (const file of req.files) {
       const extension = path.extname(file.originalname).toLowerCase();
+      const fileName = `${Date.now()}${extension}`;
       const params = {
         Bucket: AWS_CONFIG.bucketName,
-        Key: `students/${validatedData.rollNumber}/${Date.now()}${extension}`,
+        Key: `students/${value.rollNumber}/${fileName}`,
         Body: file.buffer,
       };
 
       const s3Response = await s3.upload(params).promise();
-
-      uploadedImages.push({
+      // const s3Response = {
+      //   Key: `students/${value.rollNumber}/${fileName}`,
+      // }
+      const uploadedImage = {
         fileName: file.originalname,
         fileSize: file.size,
         key: s3Response.Key,
-        url: s3Response.Location,
+        // url: s3Response.Location,
         uploadedAt: new Date(),
-      });
+      }
+
+      uploadedImages.push(uploadedImage);
+      files.push({
+        originalname: fileName,
+        buffer: file.buffer
+      })
     }
 
     const studentData = {
-      ...validatedData,
+      ...value,
       images: uploadedImages,
     };
 
     const student = await Student.create(studentData);
+    // const student = { ...studentData };
+
+    // Call external API to generate embeddings
+    const apiResponse = await generateEmbeddings(files);
+    // console.log("API Response:", apiResponse.data);
+    // console.log("API Response:", apiResponse.data.embeddings);
+
+    if (apiResponse.data.embeddings) {
+      student.embeddings = apiResponse.data.embeddings;
+      await student.save();
+    }
+
     return ResponseHandler.success(
       res,
       student,
@@ -144,7 +164,7 @@ const create = async (req, res) => {
 // READ ALL
 const getAll = async (req, res) => {
   try {
-    const students = await Student.find();
+    const students = await Student.find().select("-images.url");
     return ResponseHandler.success(
       res,
       students,
@@ -158,7 +178,7 @@ const getAll = async (req, res) => {
 // READ BY ID
 const getById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
+    const student = await Student.findById(req.params.id).select("-images.url");
     if (!student) {
       return ResponseHandler.notFound(res, "Student not found");
     }
