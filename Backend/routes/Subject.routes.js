@@ -9,5 +9,6 @@ router.get('/', subjectController.getAll);
 router.get('/:id', idValidator, subjectController.getById);
 router.put('/:id', idValidator, subjectController.update);
 router.delete('/:id', idValidator, subjectController.remove);
+router.delete('/', subjectController.removeAll);
 
 export default router;

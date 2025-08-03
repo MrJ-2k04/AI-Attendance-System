@@ -10,5 +10,6 @@ router.get('/:id', idValidator, lectureController.getById);
 router.put('/:id', idValidator, lectureController.update);
 router.delete('/:id', idValidator, lectureController.remove);
 router.post('/:id/generate', idValidator, lectureController.generateAttendance);
+router.delete('/', lectureController.removeAll);
 
 export default router;

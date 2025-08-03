@@ -99,4 +99,14 @@ const remove = async (req, res) => {
   }
 };
 
-export default { create, getAll, getById, update, remove };
+// DELETE ALL
+const removeAll = async (req, res) => {
+  try {
+    await Subject.deleteMany({});
+    return ResponseHandler.success(res, null, "All subjects deleted");
+  } catch (err) {
+    return ResponseHandler.error(res, err);
+  }
+};
+
+export default { create, getAll, getById, update, remove, removeAll };

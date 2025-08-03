@@ -80,10 +80,21 @@ const remove = async (req, res) => {
   }
 };
 
+// DELETE ALL
+const removeAll = async (req, res) => {
+  try {
+    await Teacher.deleteMany({});
+    return ResponseHandler.success(res, null, "All teachers deleted");
+  } catch (err) {
+    return ResponseHandler.error(res, err);
+  }
+};
+
 export default {
   create,
   getAll,
   getById,
+  removeAll,
   update,
   remove,
 };

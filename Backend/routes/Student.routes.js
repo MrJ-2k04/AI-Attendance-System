@@ -9,5 +9,6 @@ router.get('/', studentController.getAll);
 router.get('/:id', idValidator, studentController.getById);
 router.put('/:id', idValidator, studentController.update);
 router.delete('/:id', idValidator, studentController.remove);
+router.delete('/', studentController.removeAll);
 
 export default router;

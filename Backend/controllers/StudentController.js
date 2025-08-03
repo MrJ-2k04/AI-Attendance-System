@@ -245,4 +245,41 @@ const remove = async (req, res) => {
   }
 };
 
-export default { create, getAll, getById, update, remove };
+// DELETE ALL
+const removeAll = async (req, res) => {
+  try {
+    // Fetch all students to get their images
+    const students = await Student.find({});
+
+    // Collect all image keys from all students
+    const allImageKeys = students
+      .filter(student => student.images && student.images.length > 0)
+      .flatMap(student => student.images.map(image => image.key));
+
+    // Delete all images from S3
+    if (allImageKeys.length > 0) {
+      try {
+        await Promise.all(
+          allImageKeys.map(key =>
+            s3
+              .deleteObject({
+                Bucket: AWS_CONFIG.bucketName,
+                Key: key,
+              })
+              .promise()
+          )
+        );
+      } catch (deleteError) {
+        console.error("Error deleting S3 files during removeAll:", deleteError);
+        // Continue with student deletion even if S3 cleanup fails
+      }
+    }
+
+    await Student.deleteMany({});
+    return ResponseHandler.success(res, null, "All students deleted");
+  } catch (err) {
+    return ResponseHandler.error(res, err);
+  }
+};
+
+export default { create, getAll, getById, update, remove, removeAll };

@@ -109,29 +109,32 @@ const create = async (req, res) => {
       files.push({
         originalname: fileName,
         buffer: file.buffer,
-      })
+      });
     }
     lecture.images = uploadedImages;
 
-
     // Get student embeddings
-    const studentEmbeddings = await Student.find({
-      division: value.division,
-    }, { embeddings: 1, rollNumber: 1 });
-
+    const studentEmbeddings = await Student.find(
+      {
+        division: value.division,
+      },
+      { embeddings: 1, rollNumber: 1 }
+    );
 
     // Call external API for attendance verification
     const apiResponse = await verifyAttendance({
       images: files,
       studentEmbeddings: studentEmbeddings,
       subjectId: value.subjectId,
-      lectureId: lecture.id
+      lectureId: lecture.id,
     });
-
 
     // Update attendance from AI results
     if (apiResponse.data && apiResponse.data.results) {
-      const presentRollNumbers = apiResponse.data.results.reduce((acc, cur) => acc.concat(cur.matchedIds), []);
+      const presentRollNumbers = apiResponse.data.results.reduce(
+        (acc, cur) => acc.concat(cur.matchedIds),
+        []
+      );
 
       // Save attendance
       lecture.attendance = studentEmbeddings.map((student) => ({
@@ -140,17 +143,15 @@ const create = async (req, res) => {
       }));
 
       // Save annotated images
-      lecture.annotatedImages = apiResponse.data.results.map(result => ({
+      lecture.annotatedImages = apiResponse.data.results.map((result) => ({
         fileName: result.fileName,
         fileSize: result.fileSize,
         key: result.key,
       }));
     }
 
-
     // Save lecture
     await lecture.save();
-
 
     return ResponseHandler.success(
       res,
@@ -304,4 +305,49 @@ const generateAttendance = async (req, res) => {
   }
 };
 
-export default { create, getAll, getById, update, remove, generateAttendance };
+// DELETE ALL
+const removeAll = async (req, res) => {
+  try {
+    // Fetch all lectures to get their images
+    const lectures = await Lecture.find({});
+
+    // Collect all image keys from all lectures
+    const allImageKeys = lectures
+      .filter((lecture) => lecture.images && lecture.images.length > 0)
+      .flatMap((lecture) => lecture.images.map((image) => image.key));
+
+    // Delete all images from S3
+    if (allImageKeys.length > 0) {
+      try {
+        await Promise.all(
+          allImageKeys.map((key) =>
+            s3
+              .deleteObject({
+                Bucket: AWS_CONFIG.bucketName,
+                Key: key,
+              })
+              .promise()
+          )
+        );
+      } catch (deleteError) {
+        console.error("Error deleting S3 files during removeAll:", deleteError);
+        // Continue with lecture deletion even if S3 cleanup fails
+      }
+    }
+
+    await Lecture.deleteMany({});
+    return ResponseHandler.success(res, null, "All lectures deleted");
+  } catch (err) {
+    return ResponseHandler.error(res, err);
+  }
+};
+
+export default {
+  create,
+  getAll,
+  getById,
+  update,
+  remove,
+  generateAttendance,
+  removeAll,
+};
