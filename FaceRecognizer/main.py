@@ -52,10 +52,11 @@ async def verify_attendance(
     embeddings_map = {}
     for student in studentEmbeddings:
         rollNumber = student['rollNumber']
-        embeddings_map[rollNumber] = {
-            "images": [item['image'] for item in student['embeddings']],
-            "values": [np.array(item['embedding']) for item in student['embeddings']]
-        }
+        if len(student['embeddings']) > 0:
+            embeddings_map[rollNumber] = {
+                "images": [item['image'] for item in student['embeddings']],
+                "values": [np.array(item['embedding']) for item in student['embeddings']]
+            }
 
     font = ImageFont.load_default()
     results = []
