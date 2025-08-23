@@ -14,6 +14,8 @@ services:
       - ./Backend:/app
     depends_on:
       - face_recognizer
+    networks:
+      - attendance-net
 
   face_recognizer:
     container_name: face_recognizer_service
@@ -26,3 +28,8 @@ services:
       - ./FaceRecognizer/.env
     volumes:
       - ./FaceRecognizer:/app
+    networks:
+      - attendance-net
+networks:
+  attendance-net:
+    driver: bridge

@@ -8,6 +8,7 @@ import io
 import json
 from utils.storage import upload_to_s3, delete_from_s3
 from utils.config import load_env
+import time
 
 app = FastAPI()
 load_env()  # Load env vars from .env
@@ -45,6 +46,7 @@ async def verify_attendance(
     subjectId: str = Form(...),
     lectureId: str = Form(...)
 ):
+    start = time.time()
     studentEmbeddings = json.loads(studentEmbeddings)
 
     embeddings_map = {}
@@ -110,6 +112,7 @@ async def verify_attendance(
 
         try:
             s3_url, s3_key = upload_to_s3(image_bytes, timestamped_name, path)
+            # s3_url, s3_key = "", ""
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
@@ -125,4 +128,5 @@ async def verify_attendance(
             delete_from_s3(s3_key)
             raise HTTPException(status_code=500, detail=f"Post-upload failure: {str(e)}")
 
+    print(f"Time taken: {time.time() - start}")
     return JSONResponse(content={"results": results})

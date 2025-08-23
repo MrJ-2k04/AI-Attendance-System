@@ -16,6 +16,7 @@ const s3 = new AWS.S3({
 
 // CREATE
 const create = async (req, res) => {
+  const startTime = Date.now();
   // Validate request body
   const lectureSchema = Joi.object({
     subjectId: Joi.string().trim().required(),
@@ -147,12 +148,14 @@ const create = async (req, res) => {
         fileName: result.fileName,
         fileSize: result.fileSize,
         key: result.key,
+        url: result.url,
       }));
     }
 
     // Save lecture
     await lecture.save();
-
+    const endTime = Date.now();
+    console.log(`Lecture creation time: ${endTime - startTime} ms or ${(endTime - startTime) / 1000} seconds`);
     return ResponseHandler.success(
       res,
       lecture,
@@ -193,6 +196,7 @@ const create = async (req, res) => {
       400
     );
   }
+
 };
 
 // READ ALL
@@ -257,15 +261,20 @@ const remove = async (req, res) => {
       return ResponseHandler.notFound(res, "Lecture not found");
     }
 
-    // Delete associated images from S3
-    if (lecture.images && lecture.images.length > 0) {
+    // Delete associated images and annotated images from S3
+    const imageKeys = [
+      ...(lecture.images || []).map((image) => image.key),
+      ...(lecture.annotatedImages || []).map((image) => image.key)
+    ];
+
+    if (imageKeys.length > 0) {
       try {
         await Promise.all(
-          lecture.images.map((image) =>
+          imageKeys.map((key) =>
             s3
               .deleteObject({
                 Bucket: AWS_CONFIG.bucketName,
-                Key: image.key,
+                Key: key,
               })
               .promise()
           )
