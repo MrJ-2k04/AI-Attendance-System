@@ -1,8 +1,11 @@
 fastapi
 uvicorn
-face_recognition
+# face_recognition
 numpy
 pillow
 python-multipart
 boto3
 python-dotenv
+insightface
+opencv-python-headless
+onnxruntime-gpu

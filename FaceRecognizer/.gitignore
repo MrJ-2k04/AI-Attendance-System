@@ -1,4 +1,6 @@
 
 __pycache__
-dataset/
+student_images/
+temp_*_images/
 .env*
+cuda-keyring_1.1-1_all.deb

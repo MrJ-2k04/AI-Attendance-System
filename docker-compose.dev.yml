@@ -30,6 +30,13 @@ services:
       - ./FaceRecognizer:/app
     networks:
       - attendance-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 networks:
   attendance-net:
     driver: bridge

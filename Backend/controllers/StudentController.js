@@ -99,7 +99,7 @@ const create = async (req, res) => {
         fileName: file.originalname,
         fileSize: file.size,
         key: s3Response.Key,
-        // url: s3Response.Location,
+        url: s3Response.Location,
         uploadedAt: new Date(),
       }
 
